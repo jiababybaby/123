@@ -4,17 +4,17 @@
 智能家居管控服务器
 
 #### Software Architecture
-Software architecture description
+QT Websocket server
 
 #### Installation
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  git clone https://gitee.com/jiababybaby/znjj_server
+2.  cd /server/build
+3.  ./server.sh
 
 #### Instructions
 
-1.  xxxx
+1.  get data of wxminiprogram and save them in the server. give that data when people use wxminiprogram.
 2.  xxxx
 3.  xxxx
 

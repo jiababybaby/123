@@ -201,6 +201,7 @@ void WebSocketServerManager::replyFinished(QNetworkReply *reply)
         QJsonObject jsonObject = document.object();
         qDebug()<<"user[session_key]=="<<jsonObject["session_key"].toString();
         qDebug()<<"user[openid]=="<<jsonObject["openid"].toString();
+        emit signal_add(jsonObject["openid"].toString());
     }
     else
     {

@@ -9,13 +9,13 @@
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  git clone https://gitee.com/jiababybaby/znjj_server
+2.  cd /server/build
+3.  ./server.sh
 
 #### 使用说明
 
-1.  xxxx
+1.  获取微信小程序客户信息，并保存在数据库中。用户下次使用该小程序时自动还原用户数据。
 2.  xxxx
 3.  xxxx
 

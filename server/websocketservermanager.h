@@ -4,8 +4,16 @@
 #include <QWebSocketServer>
 #include <QThread>
 #include <QNetworkAccessManager>
-
-#include <QObject>
+#include "websocketservermanager.h"
+#include <QDebug>
+#include <QWebSocket>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QNetworkReply>
 
 class WebSocketServerManager : public QObject
 {
@@ -29,7 +37,7 @@ signals:
     void signal_textFrameReceived(QString ip, quint32 port, QString frame, bool isLastFrame);
     void signal_textMessageReceived(QString ip, quint32 port,QString message);
     void signal_close();
-
+    void signal_add(QString id,QString name="",QString net_sn="",QString device_sn="");
 public slots:
     void slot_start(QHostAddress hostAddress = QHostAddress(QHostAddress::Any), qint32 port = 10080);
     void slot_stop();

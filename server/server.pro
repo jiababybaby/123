@@ -1,5 +1,5 @@
 QT -= gui
-QT += websockets
+QT += websockets sql
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -16,7 +16,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp \
-    websocketservermanager.cpp
+    websocketservermanager.cpp \
+    mysql.cpp
 
 HEADERS += \
-    websocketservermanager.h
+    websocketservermanager.h \
+    mysql.h

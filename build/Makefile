@@ -12,10 +12,10 @@ MAKEFILE      = Makefile
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_WEBSOCKETS_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_WEBSOCKETS_LIB -DQT_NETWORK_LIB -DQT_SQL_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I../server -I. -I/opt/Qt5.9.5/5.9.5/gcc_64/include -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore -I. -I/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++
+INCPATH       = -I../server -I. -I/opt/Qt5.9.5/5.9.5/gcc_64/include -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore -I. -I/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++
 QMAKE         = /opt/Qt5.9.5/5.9.5/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -35,10 +35,10 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = server1.0.0
-DISTDIR = /root/server/build/.tmp/server1.0.0
+DISTDIR = /home/baby/server/build/.tmp/server1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/opt/Qt5.9.5/5.9.5/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/opt/Qt5.9.5/5.9.5/gcc_64/lib -lQt5WebSockets -lQt5Network -lQt5Core -lpthread 
+LIBS          = $(SUBLIBS) -L/opt/Qt5.9.5/5.9.5/gcc_64/lib -lQt5WebSockets -lQt5Network -lQt5Sql -lQt5Core -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -51,10 +51,14 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../server/main.cpp \
-		../server/websocketservermanager.cpp moc_websocketservermanager.cpp
+		../server/websocketservermanager.cpp \
+		../server/mysql.cpp moc_websocketservermanager.cpp \
+		moc_mysql.cpp
 OBJECTS       = main.o \
 		websocketservermanager.o \
-		moc_websocketservermanager.o
+		mysql.o \
+		moc_websocketservermanager.o \
+		moc_mysql.o
 DIST          = /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/common/unix.conf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/common/linux.conf \
@@ -216,7 +220,6 @@ DIST          = /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/spec_post.prf \
-		../server/.qmake.stash \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/toolchain.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/default_pre.prf \
@@ -234,8 +237,10 @@ DIST          = /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/exceptions.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/yacc.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/lex.prf \
-		../server/server.pro ../server/websocketservermanager.h ../server/main.cpp \
-		../server/websocketservermanager.cpp
+		../server/server.pro ../server/websocketservermanager.h \
+		../server/mysql.h ../server/main.cpp \
+		../server/websocketservermanager.cpp \
+		../server/mysql.cpp
 QMAKE_TARGET  = server
 DESTDIR       = 
 TARGET        = server
@@ -408,7 +413,6 @@ Makefile: ../server/server.pro /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++/qmake
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/toolchain.prf \
 		/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/default_pre.prf \
@@ -429,6 +433,7 @@ Makefile: ../server/server.pro /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++/qmake
 		../server/server.pro \
 		/opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5WebSockets.prl \
 		/opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5Network.prl \
+		/opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5Sql.prl \
 		/opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5Core.prl
 	$(QMAKE) -o Makefile ../server/server.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
 /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/spec_pre.prf:
@@ -592,7 +597,6 @@ Makefile: ../server/server.pro /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++/qmake
 /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/qt_config.prf:
 /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++/qmake.conf:
 /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/spec_post.prf:
-.qmake.stash:
 /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/exclusive_builds.prf:
 /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/toolchain.prf:
 /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/default_pre.prf:
@@ -613,6 +617,7 @@ Makefile: ../server/server.pro /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++/qmake
 ../server/server.pro:
 /opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5WebSockets.prl:
 /opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5Network.prl:
+/opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5Sql.prl:
 /opt/Qt5.9.5/5.9.5/gcc_64/lib/libQt5Core.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ../server/server.pro -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug
@@ -629,8 +634,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../server/websocketservermanager.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../server/main.cpp ../server/websocketservermanager.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../server/websocketservermanager.h ../server/mysql.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../server/main.cpp ../server/websocketservermanager.cpp ../server/mysql.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -662,9 +667,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++11 -Wall -W -dM -E -o moc_predefs.h /opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_websocketservermanager.cpp
+compiler_moc_header_make_all: moc_websocketservermanager.cpp moc_mysql.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_websocketservermanager.cpp
+	-$(DEL_FILE) moc_websocketservermanager.cpp moc_mysql.cpp
 moc_websocketservermanager.cpp: /opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QObject \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobject.h \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobjectdefs.h \
@@ -749,10 +754,96 @@ moc_websocketservermanager.cpp: /opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QObject
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QSslError \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QThread \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qthread.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkAccessManager \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkaccessmanager.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkrequest.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QSharedDataPointer \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QUrl \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qurl.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qurlquery.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QVariant \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QVector \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QMetaType \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QDebug \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/QWebSocket \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/qwebsocket.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QAbstractSocket \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkRequest \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkProxy \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkproxy.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonDocument \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsondocument.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonvalue.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonParseError \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonObject \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonobject.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonArray \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonarray.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonValue \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkReply \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkreply.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QIODevice \
 		../server/websocketservermanager.h \
 		moc_predefs.h \
 		/opt/Qt5.9.5/5.9.5/gcc_64/bin/moc
-	/opt/Qt5.9.5/5.9.5/gcc_64/bin/moc $(DEFINES) --include ./moc_predefs.h -I/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++ -I/root/server/server -I/opt/Qt5.9.5/5.9.5/gcc_64/include -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore -I. -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include ../server/websocketservermanager.h -o moc_websocketservermanager.cpp
+	/opt/Qt5.9.5/5.9.5/gcc_64/bin/moc $(DEFINES) --include ./moc_predefs.h -I/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++ -I/home/baby/server/server -I/opt/Qt5.9.5/5.9.5/gcc_64/include -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore -I. -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include ../server/websocketservermanager.h -o moc_websocketservermanager.cpp
+
+moc_mysql.cpp: /opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QObject \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobject.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobjectdefs.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qnamespace.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qglobal.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qconfig.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qtcore-config.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qsystemdetection.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qprocessordetection.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qtypeinfo.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qsysinfo.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qlogging.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qflags.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qbasicatomic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qgenericatomic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qglobalstatic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qmutex.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qnumeric.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qversiontagging.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstring.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qchar.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qbytearray.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qrefcount.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qarraydata.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstringbuilder.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qlist.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qalgorithms.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qiterator.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qhashfunctions.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qpair.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qbytearraylist.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstringlist.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qregexp.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstringmatcher.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qcoreevent.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qscopedpointer.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qmetatype.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobject_impl.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSqlDatabase \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qsqldatabase.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qtsqlglobal.h \
+		../server/mysql.h \
+		moc_predefs.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/bin/moc
+	/opt/Qt5.9.5/5.9.5/gcc_64/bin/moc $(DEFINES) --include ./moc_predefs.h -I/opt/Qt5.9.5/5.9.5/gcc_64/mkspecs/linux-g++ -I/home/baby/server/server -I/opt/Qt5.9.5/5.9.5/gcc_64/include -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql -I/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore -I. -I/usr/include/c++/4.8.5 -I/usr/include/c++/4.8.5/x86_64-redhat-linux -I/usr/include/c++/4.8.5/backward -I/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include -I/usr/local/include -I/usr/include ../server/mysql.h -o moc_mysql.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -854,7 +945,41 @@ main.o: ../server/main.cpp /opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QCoreApplica
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QSslError \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QThread \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qthread.h \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QDebug
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkAccessManager \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkaccessmanager.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkrequest.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QSharedDataPointer \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QUrl \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qurl.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qurlquery.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QVariant \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QVector \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QMetaType \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QDebug \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/QWebSocket \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/qwebsocket.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QAbstractSocket \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkRequest \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkProxy \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkproxy.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonDocument \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsondocument.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonvalue.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonParseError \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonObject \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonobject.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonArray \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonarray.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonValue \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkReply \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkreply.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QIODevice \
+		../server/mysql.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSqlDatabase \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qsqldatabase.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qtsqlglobal.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../server/main.cpp
 
 websocketservermanager.o: ../server/websocketservermanager.cpp ../server/websocketservermanager.h \
@@ -942,17 +1067,23 @@ websocketservermanager.o: ../server/websocketservermanager.cpp ../server/websock
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QSslError \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QThread \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qthread.h \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QDebug \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/QWebSocket \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/qwebsocket.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkAccessManager \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkaccessmanager.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkrequest.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QSharedDataPointer \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QUrl \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qurl.h \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qurlquery.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QVariant \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QVector \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QMetaType \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QDebug \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/QWebSocket \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtWebSockets/qwebsocket.h \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QAbstractSocket \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkRequest \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkrequest.h \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QSharedDataPointer \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QVariant \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkProxy \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkproxy.h \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonDocument \
@@ -963,11 +1094,95 @@ websocketservermanager.o: ../server/websocketservermanager.cpp ../server/websock
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonobject.h \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonArray \
 		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qjsonarray.h \
-		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonValue
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QJsonValue \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/QNetworkReply \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtNetwork/qnetworkreply.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QIODevice
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o websocketservermanager.o ../server/websocketservermanager.cpp
+
+mysql.o: ../server/mysql.cpp ../server/mysql.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QObject \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobject.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobjectdefs.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qnamespace.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qglobal.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qconfig.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qtcore-config.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qsystemdetection.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qprocessordetection.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qtypeinfo.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qsysinfo.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qlogging.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qflags.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qbasicatomic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qgenericatomic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qglobalstatic.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qmutex.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qnumeric.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qversiontagging.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstring.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qchar.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qbytearray.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qrefcount.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qarraydata.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstringbuilder.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qlist.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qalgorithms.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qiterator.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qhashfunctions.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qpair.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qbytearraylist.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstringlist.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qregexp.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qstringmatcher.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qcoreevent.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qscopedpointer.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qmetatype.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qobject_impl.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSqlDatabase \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qsqldatabase.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qtsqlglobal.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSql \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSqlQueryModel \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qsqlquerymodel.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qvariant.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qmap.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qdebug.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qhash.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qtextstream.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qiodevice.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qlocale.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qshareddata.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qvector.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qpoint.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qset.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qsharedpointer.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSqlQuery \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qsqlquery.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSqlRecord \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qsqlrecord.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/QSqlError \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtSql/qsqlerror.h \
+		/opt/Qt5.9.5/5.9.5/gcc_64/include/QtCore/QDebug
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mysql.o ../server/mysql.cpp
 
 moc_websocketservermanager.o: moc_websocketservermanager.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_websocketservermanager.o moc_websocketservermanager.cpp
+
+moc_mysql.o: moc_mysql.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mysql.o moc_mysql.cpp
 
 ####### Install
 
